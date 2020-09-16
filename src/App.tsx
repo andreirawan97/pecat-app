@@ -1,7 +1,7 @@
 import React from 'react';
 
-import SplashScene from './scenes/SplashScene';
+import MainNavigator from './routes/MainNavigator';
 
 export default function App() {
-  return <SplashScene />;
+  return <MainNavigator />;
 }

@@ -1,20 +1,34 @@
 import React, { ReactNode } from 'react';
-import { StyleSheet, View, ViewProps } from 'react-native';
-// import { StatusBar } from 'expo-status-bar';
+import {
+  Keyboard,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+  ViewProps,
+} from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
 
 type Props = {
   children: ReactNode;
+  statusBarStyle?: 'auto' | 'inverted' | 'light' | 'dark';
 } & ViewProps;
 
 export default function FrameView(props: Props) {
+  let { statusBarStyle } = props;
+
   const statusBarHeight = Constants.statusBarHeight;
 
   return (
-    <View style={[styles.container, { marginTop: statusBarHeight }]} {...props}>
-      {/* <StatusBar style="light" /> */}
-      {props.children}
-    </View>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View
+        style={[styles.container, { marginTop: statusBarHeight }]}
+        {...props}
+      >
+        {props.children}
+        <StatusBar style={statusBarStyle} />
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
