@@ -22,8 +22,8 @@ export default function FrameView(props: Props) {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View
-        style={[styles.container, { marginTop: statusBarHeight }]}
         {...props}
+        style={[styles.container, { marginTop: statusBarHeight }, props.style]}
       >
         {props.children}
         <StatusBar style={statusBarStyle} />
