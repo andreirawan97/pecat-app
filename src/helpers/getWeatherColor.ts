@@ -8,6 +8,9 @@ export function getWeatherTextColor(weather: string) {
     case 'sunny': {
       return COLORS.SUNNY;
     }
+    case 'Berawan': {
+      return COLORS.RAIN;
+    }
     default: {
       return 'black';
     }
@@ -21,6 +24,9 @@ export function getWeatherCelciusColor(weather: string) {
     }
     case 'sunny': {
       return COLORS.SUNNY_TEXT;
+    }
+    case 'Berawan': {
+      return COLORS.RAIN_TEXT;
     }
     default: {
       return 'black';
