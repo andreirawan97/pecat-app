@@ -7,20 +7,25 @@ import {
   Text,
   View,
 } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import BottomSheet from 'react-native-raw-bottom-sheet';
 
-import { BerawanIcon, RainImage } from '../../assets';
 import { Button } from '../components';
 import { FrameView } from '../core-ui';
-import {
-  getWeatherTextColor,
-  getWeatherCelciusColor,
-} from '../helpers/getWeatherColor';
+import getWeatherColor from '../helpers/getWeatherColor';
+import getWeatherIcon from '../helpers/getWeatherIcon';
+import getWeatherImage from '../helpers/getWeatherImage';
+import sanitizeDesc from '../helpers/sanitizeDesc';
+import { Weather } from '../types/bmkg';
 import { NavigationScreenProps } from '../types/navigation';
 
 type Props = {} & NavigationScreenProps;
 export default function MainScene(props: Props) {
-  const CURRENT_WEATHER = 'Berawan';
+  const CURRENT_WEATHER: Weather = 'Hujan Badai';
+  const WEATHER_DESC =
+    'Angin di wilayah Selat Sunda bagian Utara umumnya bertiup dari Timur - Selatan dengan kecepatan 2 - 20 knot. Angin di wilayah Selat Sunda bagian Selatan umumnya bertiup dari Timur - Selatan dengan kecepatan 1 - 20 knot. Angin di wilayah Perairan Selatan Banten umumnya bertiup dari Timur - Selatan dengan kecepatan 1 - 15 knot. Angin di wilayah Samudera Hindia Selatan Banten umumnya bertiup dari Timur - Tenggara dengan kecepatan 1 - 15 knot.<br />\n&nbsp;';
+  const WARNING_DESC =
+    'Waspada gelombang laut dengan ketinggian 4.0 - 6.0 meter di wilayah Selat Sunda bagian Selatan,&nbsp;Perairan Selatan Banten&nbsp;dan Samudera Hindia Selatan Banten yang beresiko tinggi terhadap semua jenis Kapal.';
 
   let bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -31,17 +36,23 @@ export default function MainScene(props: Props) {
         <Text
           style={[
             styles.weatherText,
-            { color: getWeatherTextColor(CURRENT_WEATHER) },
+            { color: getWeatherColor(CURRENT_WEATHER) },
           ]}
         >
-          Berawan
+          {CURRENT_WEATHER}
         </Text>
-        <Image source={BerawanIcon} style={{ width: 40, height: 40 }} />
+        <Image
+          source={getWeatherIcon(CURRENT_WEATHER)}
+          style={{ width: 40, height: 40 }}
+        />
 
         <Image
-          source={RainImage}
+          source={getWeatherImage(CURRENT_WEATHER)}
           style={{
-            width: '100%',
+            flex: 1,
+            resizeMode: 'contain',
+            alignSelf: 'center',
+            marginBottom: 8,
           }}
         />
       </View>
@@ -57,7 +68,19 @@ export default function MainScene(props: Props) {
             bottomSheetRef.current?.open();
           }}
           titleColor="white"
-          backgroundColor={getWeatherTextColor(CURRENT_WEATHER)}
+          backgroundColor={getWeatherColor(CURRENT_WEATHER)}
+          containerStyle={{ marginBottom: 12 }}
+        />
+        <Button
+          title="Lihat Jadwal Kerja"
+          onPress={() => {
+            props.navigation.navigate('JadwalScene', {
+              color: getWeatherColor(CURRENT_WEATHER),
+            });
+          }}
+          titleColor="white"
+          backgroundColor={getWeatherColor(CURRENT_WEATHER)}
+          mode="outline"
         />
       </View>
 
@@ -71,54 +94,51 @@ export default function MainScene(props: Props) {
             padding: 16,
           },
         }}
-        height={Dimensions.get('window').height - 300}
+        height={
+          Dimensions.get('window').height -
+          Dimensions.get('window').height * 0.3
+        }
         openDuration={250}
+        dragFromTopOnly={true}
       >
         <ScrollView>
-          <Text style={styles.headerText}>Informasi Tambahan</Text>
+          <TouchableWithoutFeedback style={{ flex: 1 }}>
+            <Text style={styles.headerText}>Informasi Tambahan</Text>
 
-          <Text style={styles.paragraphText}>
-            <Text style={{ fontWeight: 'bold' }}>Kategori Ombak: </Text>Sedang
-          </Text>
-          <Text style={styles.paragraphText}>
-            <Text style={{ fontWeight: 'bold' }}>Tinggi Ombak: </Text>1.25 -
-            2.50 m
-          </Text>
-          <Text style={styles.paragraphText}>
-            <Text style={{ fontWeight: 'bold' }}>
-              Kecepatan angin minimum:{' '}
+            <Text style={styles.paragraphText}>
+              <Text style={{ fontWeight: 'bold' }}>Kategori Ombak: </Text>Sedang
             </Text>
-            4 knot
-          </Text>
-          <Text style={styles.paragraphText}>
-            <Text style={{ fontWeight: 'bold' }}>
-              Kecepatan angin maksimum:{' '}
+            <Text style={styles.paragraphText}>
+              <Text style={{ fontWeight: 'bold' }}>Tinggi Ombak: </Text>1.25 -
+              2.50 m
             </Text>
-            20 knot
-          </Text>
-          <Text style={[styles.paragraphText, { fontWeight: 'bold' }]}>
-            Angin berhembus dari arah Timur ke arah Selatan
-          </Text>
+            <Text style={styles.paragraphText}>
+              <Text style={{ fontWeight: 'bold' }}>
+                Kecepatan angin minimum:{' '}
+              </Text>
+              4 knot
+            </Text>
+            <Text style={styles.paragraphText}>
+              <Text style={{ fontWeight: 'bold' }}>
+                Kecepatan angin maksimum:{' '}
+              </Text>
+              20 knot
+            </Text>
+            <Text style={[styles.paragraphText, { fontWeight: 'bold' }]}>
+              Angin berhembus dari arah Timur ke arah Selatan
+            </Text>
 
-          <View
-            style={{ marginVertical: 20, height: 1, backgroundColor: 'black' }}
-          />
+            <View
+              style={{
+                marginVertical: 20,
+                height: 1,
+                backgroundColor: 'black',
+              }}
+            />
 
-          <Text style={styles.infoText}>
-            Angin di wilayah Selat Sunda bagian Utara umumnya bertiup dari
-            Selatan - Barat Daya dengan kecepatan 4 - 20 knot. Angin di wilayah
-            Selat Sunda bagian Selatan umumnya bertiup dari Selatan - Barat Daya
-            dengan kecepatan 4 - 20 knot. Angin di wilayah Perairan Selatan
-            Banten umumnya bertiup dari Timur - Selatan dengan kecepatan 1 - 15
-            knot. Angin di wilayah Samudera Hindia Selatan Banten umumnya
-            bertiup dari Timur - Selatan dengan kecepatan 4 - 20 knot
-          </Text>
-          <Text style={styles.infoText}>
-            Waspada gelombang laut dengan ketinggian 1.25 - 2.5 meter di wilayah
-            Selat Sunda bagian Selatan, Perairan Selatan Banten dan Samudera
-            Hindia Selatan Banten yang beresiko tinggi terhadap Perahu Nelayan
-            dan Kapal Tongkang.
-          </Text>
+            <Text style={styles.infoText}>{sanitizeDesc(WEATHER_DESC)}</Text>
+            <Text style={styles.infoText}>{sanitizeDesc(WARNING_DESC)}</Text>
+          </TouchableWithoutFeedback>
         </ScrollView>
       </BottomSheet>
     </FrameView>
@@ -137,10 +157,6 @@ const styles = StyleSheet.create({
   weatherText: {
     fontSize: 36,
     marginBottom: 8,
-  },
-  celciusText: {
-    fontSize: 28,
-    marginBottom: 12,
   },
   infoText: {
     color: 'rgba(0,0,0,0.6)',

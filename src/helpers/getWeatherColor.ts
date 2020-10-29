@@ -1,35 +1,37 @@
 import { COLORS } from '../constants/colors';
+import { Weather } from '../types/bmkg';
 
-export function getWeatherTextColor(weather: string) {
+export default function getWeatherColor(weather: Weather) {
   switch (weather) {
-    case 'rain': {
-      return COLORS.RAIN;
+    case 'Cerah': {
+      return COLORS.SUNNY;
     }
-    case 'sunny': {
+    case 'Cerah Berawan': {
       return COLORS.SUNNY;
     }
     case 'Berawan': {
+      return COLORS.SUNNY;
+    }
+    case 'Berawan Tebal': {
+      return COLORS.SUNNY;
+    }
+    case 'Hujan Lokal': {
+      return COLORS.RAIN;
+    }
+    case 'Hujan Ringan': {
+      return COLORS.RAIN;
+    }
+    case 'Hujan Sedang': {
+      return COLORS.RAIN;
+    }
+    case 'Hujan Lebat': {
+      return COLORS.RAIN;
+    }
+    case 'Hujan Badai': {
       return COLORS.RAIN;
     }
     default: {
-      return 'black';
-    }
-  }
-}
-
-export function getWeatherCelciusColor(weather: string) {
-  switch (weather) {
-    case 'rain': {
-      return COLORS.RAIN_TEXT;
-    }
-    case 'sunny': {
-      return COLORS.SUNNY_TEXT;
-    }
-    case 'Berawan': {
-      return COLORS.RAIN_TEXT;
-    }
-    default: {
-      return 'black';
+      return COLORS.PRIMARY;
     }
   }
 }

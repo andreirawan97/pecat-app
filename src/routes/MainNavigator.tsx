@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import SplashScene from '../scenes/SplashScene';
 import AuthScene from '../scenes/AuthScene';
 import MainScene from '../scenes/MainScene';
+import JadwalScene from '../scenes/JadwalScene';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +20,7 @@ export default function MainNavigator() {
   const MainStackNavigator = () => (
     <Stack.Navigator headerMode="none">
       <Stack.Screen name="MainScene" component={MainScene} />
+      <Stack.Screen name="JadwalScene" component={JadwalScene} />
     </Stack.Navigator>
   );
 
