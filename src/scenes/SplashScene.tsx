@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, Animated } from 'react-native';
+import React from 'react';
+import { StyleSheet, Image, Animated } from 'react-native';
 
 import { PertaminaLogo } from '../../assets';
 import { FrameView } from '../core-ui';
@@ -8,12 +8,6 @@ import { NavigationScreenProps } from '../types/navigation';
 type Props = {} & NavigationScreenProps;
 
 export default function SplashScene(props: Props) {
-  useEffect(() => {
-    setTimeout(() => {
-      props.navigation.navigate('AuthScene');
-    }, 1000);
-  }, [props]);
-
   return (
     <FrameView style={styles.container}>
       <Image source={PertaminaLogo} style={styles.pertaminaLogo} />

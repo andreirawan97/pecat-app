@@ -1,14 +1,17 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   Image,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import BottomSheet from 'react-native-raw-bottom-sheet';
+import { Entypo } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-community/async-storage';
 
 import { Button } from '../components';
 import { FrameView } from '../core-ui';
@@ -18,9 +21,14 @@ import getWeatherImage from '../helpers/getWeatherImage';
 import sanitizeDesc from '../helpers/sanitizeDesc';
 import { Weather } from '../types/bmkg';
 import { NavigationScreenProps } from '../types/navigation';
+import { Employee } from '../types/employee';
+import { STORAGE_KEY } from '../constants/storageKey';
 
 type Props = {} & NavigationScreenProps;
 export default function MainScene(props: Props) {
+  let [employeeInfo, setEmployeeInfo] = useState<Employee>();
+  let [isMenuVisible, setMenuVisibility] = useState(false);
+
   const CURRENT_WEATHER: Weather = 'Hujan Badai';
   const WEATHER_DESC =
     'Angin di wilayah Selat Sunda bagian Utara umumnya bertiup dari Timur - Selatan dengan kecepatan 2 - 20 knot. Angin di wilayah Selat Sunda bagian Selatan umumnya bertiup dari Timur - Selatan dengan kecepatan 1 - 20 knot. Angin di wilayah Perairan Selatan Banten umumnya bertiup dari Timur - Selatan dengan kecepatan 1 - 15 knot. Angin di wilayah Samudera Hindia Selatan Banten umumnya bertiup dari Timur - Tenggara dengan kecepatan 1 - 15 knot.<br />\n&nbsp;';
@@ -29,10 +37,59 @@ export default function MainScene(props: Props) {
 
   let bottomSheetRef = useRef<BottomSheet>(null);
 
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY.EMPLOYEE_INFO, (err, result) => {
+      if (result) {
+        setEmployeeInfo(JSON.parse(result));
+      }
+    });
+  }, []);
+
   return (
     <FrameView style={styles.container}>
+      <View
+        style={{
+          flexDirection: 'row',
+          width: '100%',
+          justifyContent: 'space-between',
+          zIndex: 1,
+        }}
+      >
+        <Text style={styles.helloText} numberOfLines={1}>
+          Hello, {employeeInfo?.name}
+        </Text>
+
+        <View>
+          <TouchableOpacity
+            onPress={() => {
+              setMenuVisibility(!isMenuVisible);
+            }}
+          >
+            <Entypo name="dots-three-vertical" size={24} />
+          </TouchableOpacity>
+          {isMenuVisible ? (
+            <View style={styles.menuContainer}>
+              <TouchableOpacity style={styles.menuItemContainer}>
+                <Text>Pilih Lokasi Tambang</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.menuItemContainer}
+                onPress={() => {
+                  AsyncStorage.clear(() => {
+                    props.navigation.reset({
+                      index: 0,
+                      routes: [{ name: 'AuthScene' }],
+                    });
+                  });
+                }}
+              >
+                <Text style={{ color: 'red' }}>Keluar</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
+        </View>
+      </View>
       <View style={{ flex: 2 }}>
-        <Text style={styles.helloText}>Hello, Andre</Text>
         <Text
           style={[
             styles.weatherText,
@@ -41,6 +98,16 @@ export default function MainScene(props: Props) {
         >
           {CURRENT_WEATHER}
         </Text>
+
+        <Text
+          style={[
+            styles.lokasiPerairanText,
+            { color: getWeatherColor(CURRENT_WEATHER) },
+          ]}
+        >
+          Perairan Samarinda - Bontang
+        </Text>
+
         <Image
           source={getWeatherIcon(CURRENT_WEATHER)}
           style={{ width: 40, height: 40 }}
@@ -96,7 +163,7 @@ export default function MainScene(props: Props) {
         }}
         height={
           Dimensions.get('window').height -
-          Dimensions.get('window').height * 0.3
+          Dimensions.get('window').height * 0.15
         }
         openDuration={250}
         dragFromTopOnly={true}
@@ -148,7 +215,7 @@ export default function MainScene(props: Props) {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-    paddingTop: 32,
+    paddingTop: 16,
   },
   helloText: {
     fontSize: 23,
@@ -156,6 +223,9 @@ const styles = StyleSheet.create({
   },
   weatherText: {
     fontSize: 36,
+  },
+  lokasiPerairanText: {
+    fontSize: 18,
     marginBottom: 8,
   },
   infoText: {
@@ -171,5 +241,23 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  menuContainer: {
+    position: 'absolute',
+    zIndex: 2,
+    top: 30,
+    right: 0,
+    width: 180,
+    backgroundColor: 'white',
+    shadowColor: 'rgba(0,0,0,0.16)',
+    shadowRadius: 6,
+    shadowOffset: {
+      width: 1,
+      height: 3,
+    },
+  },
+  menuItemContainer: {
+    paddingLeft: 12,
+    paddingVertical: 12,
   },
 });

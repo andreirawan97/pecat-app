@@ -12,12 +12,15 @@ import Constants from 'expo-constants';
 type Props = {
   children: ReactNode;
   statusBarStyle?: 'auto' | 'inverted' | 'light' | 'dark';
+  disableStatusBarPadding?: boolean;
 } & ViewProps;
 
 export default function FrameView(props: Props) {
-  let { statusBarStyle } = props;
+  let { statusBarStyle, disableStatusBarPadding } = props;
 
-  const statusBarHeight = Constants.statusBarHeight;
+  const statusBarHeight = disableStatusBarPadding
+    ? 0
+    : Constants.statusBarHeight;
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>

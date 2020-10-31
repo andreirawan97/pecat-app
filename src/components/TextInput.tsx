@@ -24,7 +24,7 @@ export default function TextInput(props: Props) {
     <View style={[styles.containerStyle, containerStyle]}>
       {label && <Text style={[styles.label, labelStyle]}>{label}</Text>}
       <View style={styles.textInputContainer}>
-        <RawTextInput style={[styles.textInput, props.style]} />
+        <RawTextInput {...props} style={[styles.textInput, props.style]} />
       </View>
     </View>
   );
