@@ -13,37 +13,77 @@ import BottomSheet from 'react-native-raw-bottom-sheet';
 import { Entypo } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-community/async-storage';
 
-import { Button } from '../components';
+import { Button, PerairanSelection, WeatherSwitcher } from '../components';
 import { FrameView } from '../core-ui';
 import getWeatherColor from '../helpers/getWeatherColor';
 import getWeatherIcon from '../helpers/getWeatherIcon';
 import getWeatherImage from '../helpers/getWeatherImage';
 import sanitizeDesc from '../helpers/sanitizeDesc';
-import { Weather } from '../types/bmkg';
+import { BMKGResponse, WeatherInfo } from '../types/bmkg';
 import { NavigationScreenProps } from '../types/navigation';
 import { Employee } from '../types/employee';
 import { STORAGE_KEY } from '../constants/storageKey';
+import { BMKG_API_URL } from '../config/network';
+import { LOKASI_PERAIRAN } from '../data/lokasiTambang';
+import findPerairanFromCode from '../helpers/findPerairanFromCode';
 
 type Props = {} & NavigationScreenProps;
 export default function MainScene(props: Props) {
   let [employeeInfo, setEmployeeInfo] = useState<Employee>();
+  let [code, setCode] = useState('M.06');
+  let [location, setLocation] = useState('');
+  let [weatherInfo, setWeatherInfo] = useState<Array<WeatherInfo>>([
+    {
+      valid_from: '',
+      valid_to: '',
+      time_desc: '',
+      weather: 'Cerah Berawan',
+      weather_desc: '',
+      warning_desc: '',
+      station_remark: '',
+      wave_cat: '',
+      wave_desc: '',
+      wind_from: '',
+      wind_to: '',
+      wind_speed_min: 0,
+      wind_speed_max: 0,
+    },
+  ]);
   let [isMenuVisible, setMenuVisibility] = useState(false);
 
-  const CURRENT_WEATHER: Weather = 'Hujan Badai';
-  const WEATHER_DESC =
-    'Angin di wilayah Selat Sunda bagian Utara umumnya bertiup dari Timur - Selatan dengan kecepatan 2 - 20 knot. Angin di wilayah Selat Sunda bagian Selatan umumnya bertiup dari Timur - Selatan dengan kecepatan 1 - 20 knot. Angin di wilayah Perairan Selatan Banten umumnya bertiup dari Timur - Selatan dengan kecepatan 1 - 15 knot. Angin di wilayah Samudera Hindia Selatan Banten umumnya bertiup dari Timur - Tenggara dengan kecepatan 1 - 15 knot.<br />\n&nbsp;';
-  const WARNING_DESC =
-    'Waspada gelombang laut dengan ketinggian 4.0 - 6.0 meter di wilayah Selat Sunda bagian Selatan,&nbsp;Perairan Selatan Banten&nbsp;dan Samudera Hindia Selatan Banten yang beresiko tinggi terhadap semua jenis Kapal.';
-
-  let bottomSheetRef = useRef<BottomSheet>(null);
+  let bottomSheetInfoRef = useRef<BottomSheet>(null);
+  let bottomSheetLokasiRef = useRef<BottomSheet>(null);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY.EMPLOYEE_INFO, (err, result) => {
+    AsyncStorage.getItem(STORAGE_KEY.EMPLOYEE_INFO, async (err, result) => {
       if (result) {
         setEmployeeInfo(JSON.parse(result));
+
+        const URL = `${BMKG_API_URL}${LOKASI_PERAIRAN[0].endpoint}`;
+        let response = await fetch(URL, {
+          method: 'GET',
+        });
+        let data = (await response.json()) as BMKGResponse;
+        setWeatherInfo(data.data);
+        setLocation(data.name);
       }
     });
   }, []);
+
+  useEffect(() => {
+    async function fetchPerairan() {
+      const URL = `${BMKG_API_URL}${findPerairanFromCode(code)?.endpoint}`;
+      let response = await fetch(URL, {
+        method: 'GET',
+      });
+      let data = (await response.json()) as BMKGResponse;
+      setWeatherInfo(data.data);
+      setLocation(data.name);
+      bottomSheetLokasiRef?.current?.close();
+    }
+
+    fetchPerairan();
+  }, [code]);
 
   return (
     <FrameView style={styles.container}>
@@ -69,7 +109,13 @@ export default function MainScene(props: Props) {
           </TouchableOpacity>
           {isMenuVisible ? (
             <View style={styles.menuContainer}>
-              <TouchableOpacity style={styles.menuItemContainer}>
+              <TouchableOpacity
+                style={styles.menuItemContainer}
+                onPress={() => {
+                  bottomSheetLokasiRef.current?.open();
+                  setMenuVisibility(false);
+                }}
+              >
                 <Text>Pilih Lokasi Tambang</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -93,28 +139,28 @@ export default function MainScene(props: Props) {
         <Text
           style={[
             styles.weatherText,
-            { color: getWeatherColor(CURRENT_WEATHER) },
+            { color: getWeatherColor(weatherInfo[0].weather) },
           ]}
         >
-          {CURRENT_WEATHER}
+          {weatherInfo[0].weather}
         </Text>
 
         <Text
           style={[
             styles.lokasiPerairanText,
-            { color: getWeatherColor(CURRENT_WEATHER) },
+            { color: getWeatherColor(weatherInfo[0].weather) },
           ]}
         >
-          Perairan Samarinda - Bontang
+          {location}
         </Text>
 
         <Image
-          source={getWeatherIcon(CURRENT_WEATHER)}
+          source={getWeatherIcon(weatherInfo[0].weather)}
           style={{ width: 40, height: 40 }}
         />
 
         <Image
-          source={getWeatherImage(CURRENT_WEATHER)}
+          source={getWeatherImage(weatherInfo[0].weather)}
           style={{
             flex: 1,
             resizeMode: 'contain',
@@ -126,33 +172,37 @@ export default function MainScene(props: Props) {
 
       <View style={{ flex: 1 }}>
         <View style={{ marginBottom: 20 }}>
-          <Text style={styles.infoText}>Kategori Ombak: Sedang</Text>
-          <Text style={styles.infoText}>Tinggi Ombak: 1.25 - 2.50 m</Text>
+          <Text style={styles.infoText}>
+            Kategori Ombak: {weatherInfo[0].wave_cat}
+          </Text>
+          <Text style={styles.infoText}>
+            Tinggi Ombak: {weatherInfo[0].wave_desc}
+          </Text>
         </View>
         <Button
           title="Lihat Informasi Tambahan"
           onPress={() => {
-            bottomSheetRef.current?.open();
+            bottomSheetInfoRef.current?.open();
           }}
           titleColor="white"
-          backgroundColor={getWeatherColor(CURRENT_WEATHER)}
+          backgroundColor={getWeatherColor(weatherInfo[0].weather)}
           containerStyle={{ marginBottom: 12 }}
         />
         <Button
           title="Lihat Jadwal Kerja"
           onPress={() => {
             props.navigation.navigate('JadwalScene', {
-              color: getWeatherColor(CURRENT_WEATHER),
+              color: getWeatherColor(weatherInfo[0].weather),
             });
           }}
           titleColor="white"
-          backgroundColor={getWeatherColor(CURRENT_WEATHER)}
+          backgroundColor={getWeatherColor(weatherInfo[0].weather)}
           mode="outline"
         />
       </View>
 
       <BottomSheet
-        ref={bottomSheetRef}
+        ref={bottomSheetInfoRef}
         closeOnDragDown
         customStyles={{
           container: {
@@ -168,45 +218,34 @@ export default function MainScene(props: Props) {
         openDuration={250}
         dragFromTopOnly={true}
       >
-        <ScrollView>
-          <TouchableWithoutFeedback style={{ flex: 1 }}>
-            <Text style={styles.headerText}>Informasi Tambahan</Text>
+        <WeatherSwitcher
+          weatherInfo={weatherInfo}
+          color={getWeatherColor(weatherInfo[0].weather)}
+        />
+      </BottomSheet>
 
-            <Text style={styles.paragraphText}>
-              <Text style={{ fontWeight: 'bold' }}>Kategori Ombak: </Text>Sedang
-            </Text>
-            <Text style={styles.paragraphText}>
-              <Text style={{ fontWeight: 'bold' }}>Tinggi Ombak: </Text>1.25 -
-              2.50 m
-            </Text>
-            <Text style={styles.paragraphText}>
-              <Text style={{ fontWeight: 'bold' }}>
-                Kecepatan angin minimum:{' '}
-              </Text>
-              4 knot
-            </Text>
-            <Text style={styles.paragraphText}>
-              <Text style={{ fontWeight: 'bold' }}>
-                Kecepatan angin maksimum:{' '}
-              </Text>
-              20 knot
-            </Text>
-            <Text style={[styles.paragraphText, { fontWeight: 'bold' }]}>
-              Angin berhembus dari arah Timur ke arah Selatan
-            </Text>
-
-            <View
-              style={{
-                marginVertical: 20,
-                height: 1,
-                backgroundColor: 'black',
-              }}
-            />
-
-            <Text style={styles.infoText}>{sanitizeDesc(WEATHER_DESC)}</Text>
-            <Text style={styles.infoText}>{sanitizeDesc(WARNING_DESC)}</Text>
-          </TouchableWithoutFeedback>
-        </ScrollView>
+      <BottomSheet
+        ref={bottomSheetLokasiRef}
+        closeOnDragDown
+        customStyles={{
+          container: {
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+            padding: 16,
+          },
+        }}
+        height={
+          Dimensions.get('window').height -
+          Dimensions.get('window').height * 0.3
+        }
+        openDuration={250}
+        dragFromTopOnly={true}
+      >
+        <PerairanSelection
+          onPressPerairan={(newCode) => {
+            setCode(newCode);
+          }}
+        />
       </BottomSheet>
     </FrameView>
   );

@@ -15,7 +15,7 @@ export type WeatherInfo = {
   valid_from: string;
   valid_to: string;
   time_desc: string;
-  weather: string;
+  weather: Weather;
   weather_desc: string;
   warning_desc: string;
   station_remark: string;

@@ -65,7 +65,7 @@ export default function JadwalScene(props: Props) {
 
       <View style={{ flex: 1 }}>
         {isFetching ? (
-          <Loading />
+          <Loading color={color} />
         ) : (
           <ScrollView>
             <JadwalList schedules={schedules} />

@@ -1,4 +1,4 @@
-export const LOKASI_TAMBANG = [
+export const LOKASI_PERAIRAN = [
   {
     code: 'M.06',
     name: 'Perairan Samarinda - Bontang',
@@ -8,5 +8,10 @@ export const LOKASI_TAMBANG = [
     code: 'M.04',
     name: 'Selat Makassar bagian tengah',
     endpoint: 'M.04_Selat%20Makassar%20bagian%20tengah.json',
+  },
+  {
+    code: 'E.01',
+    name: 'Perairan Riau',
+    endpoint: 'E.01_Perairan%20Riau.json',
   },
 ];

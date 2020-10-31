@@ -1,10 +1,12 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-export default function Loading() {
+type Props = { color?: string };
+export default function Loading(props: Props) {
+  let { color } = props;
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" />
+      <ActivityIndicator size="large" color={color} />
     </View>
   );
 }
