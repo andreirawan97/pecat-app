@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import BottomSheet from 'react-native-raw-bottom-sheet';
 import { Entypo } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-community/async-storage';
@@ -18,7 +17,6 @@ import { FrameView } from '../core-ui';
 import getWeatherColor from '../helpers/getWeatherColor';
 import getWeatherIcon from '../helpers/getWeatherIcon';
 import getWeatherImage from '../helpers/getWeatherImage';
-import sanitizeDesc from '../helpers/sanitizeDesc';
 import { BMKGResponse, WeatherInfo } from '../types/bmkg';
 import { NavigationScreenProps } from '../types/navigation';
 import { Employee } from '../types/employee';

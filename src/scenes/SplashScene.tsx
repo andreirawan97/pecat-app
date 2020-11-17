@@ -20,7 +20,7 @@ export default function SplashScene(props: Props) {
         } else {
           navigation.replace('AuthScene');
         }
-      }, 3000);
+      }, 1000);
     });
   }, [navigation]);
 

@@ -5,9 +5,8 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  ViewStyle,
-  TouchableWithoutFeedback,
 } from 'react-native';
+
 import sanitizeDesc from '../helpers/sanitizeDesc';
 import { WeatherInfo } from '../types/bmkg';
 
