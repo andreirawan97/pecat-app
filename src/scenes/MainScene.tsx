@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import BottomSheet from 'react-native-raw-bottom-sheet';
 import { Entypo } from '@expo/vector-icons';
@@ -119,33 +120,6 @@ export default function MainScene(props: Props) {
           >
             <Entypo name="dots-three-vertical" size={24} />
           </TouchableOpacity>
-          {isMenuVisible ? (
-            <View style={styles.menuContainer}>
-              <TouchableOpacity
-                style={styles.menuItemContainer}
-                onPress={() => {
-                  bottomSheetLokasiRef.current?.open();
-                  setMenuVisibility(false);
-                }}
-              >
-                <Text>Pilih Lokasi Tambang</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.menuItemContainer}
-                onPress={() => {
-                  // Proses log out. Clear storage, balik ke AuthScene
-                  AsyncStorage.clear(() => {
-                    props.navigation.reset({
-                      index: 0,
-                      routes: [{ name: 'AuthScene' }],
-                    });
-                  });
-                }}
-              >
-                <Text style={{ color: 'red' }}>Keluar</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
         </View>
       </View>
       <View style={{ flex: 2 }}>
@@ -260,6 +234,49 @@ export default function MainScene(props: Props) {
           }}
         />
       </BottomSheet>
+
+      {isMenuVisible ? (
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            zIndex: 2,
+            backgroundColor: 'transparent',
+            top: 0,
+            left: 0,
+            width: Dimensions.get('window').width,
+            height: '100%',
+          }}
+          onPress={() => {
+            setMenuVisibility(false);
+          }}
+        >
+          <View style={styles.menuContainer}>
+            <TouchableOpacity
+              style={styles.menuItemContainer}
+              onPress={() => {
+                bottomSheetLokasiRef.current?.open();
+                setMenuVisibility(false);
+              }}
+            >
+              <Text>Pilih Lokasi Tambang</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.menuItemContainer}
+              onPress={() => {
+                // Proses log out. Clear storage, balik ke AuthScene
+                AsyncStorage.clear(() => {
+                  props.navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'AuthScene' }],
+                  });
+                });
+              }}
+            >
+              <Text style={{ color: 'red' }}>Keluar</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      ) : null}
     </FrameView>
   );
 }
@@ -311,14 +328,5 @@ const styles = StyleSheet.create({
   menuItemContainer: {
     paddingLeft: 12,
     paddingVertical: 12,
-  },
-  menuBackdrop: {
-    position: 'absolute',
-    zIndex: 3,
-    backgroundColor: 'red',
-    top: 0,
-    right: 0,
-    width: 300,
-    height: 300,
   },
 });
