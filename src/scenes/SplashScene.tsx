@@ -12,6 +12,7 @@ type Props = {} & NavigationScreenProps;
 export default function SplashScene(props: Props) {
   let { navigation } = props;
 
+  // Nge cek, kalo storagenya kosong (user belum login) ke halaman AuthScene, kalo storagenya ada ke halaman MainScene
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY.EMPLOYEE_INFO, (error, result) => {
       setTimeout(() => {

@@ -28,6 +28,7 @@ export default function JadwalScene(props: Props) {
   };
 
   useEffect(() => {
+    // Ambil dari storage employee info, kemudian pangggil get schedule yang dimana ngirim uid employee.
     AsyncStorage.getItem(STORAGE_KEY.EMPLOYEE_INFO, async (err, result) => {
       if (result) {
         const employee = JSON.parse(result) as Employee;

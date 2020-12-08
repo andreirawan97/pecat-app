@@ -14,4 +14,9 @@ export const LOKASI_PERAIRAN = [
     name: 'Perairan Riau',
     endpoint: 'E.01_Perairan%20Riau.json',
   },
+  {
+    code: 'T.14',
+    name: 'Perairan Kepulauan Kai',
+    endpoint: 'T.14_Perairan%20Kep.%20Kai.json',
+  },
 ];

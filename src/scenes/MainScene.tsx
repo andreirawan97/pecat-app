@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   Image,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -27,6 +28,14 @@ import findPerairanFromCode from '../helpers/findPerairanFromCode';
 
 type Props = {} & NavigationScreenProps;
 export default function MainScene(props: Props) {
+  /**
+   * Inisialisasi variabel
+   * Employee Info isinya employee info wkwkwkwk
+   * Code isinya code dari lokasinya.
+   * Location isinya lokasi dari perariannya
+   * Weather info isinya array of weather info buat cuaca hari ini dan besok
+   * isMenuVisible buat nge cek menu pojok kanan atas visible atau ngga.
+   */
   let [employeeInfo, setEmployeeInfo] = useState<Employee>();
   let [code, setCode] = useState('M.06');
   let [location, setLocation] = useState('');
@@ -49,14 +58,17 @@ export default function MainScene(props: Props) {
   ]);
   let [isMenuVisible, setMenuVisibility] = useState(false);
 
+  // Ref atau ID dari bottomSheet yang bakal dipanggil pake open() atau close()
   let bottomSheetInfoRef = useRef<BottomSheet>(null);
   let bottomSheetLokasiRef = useRef<BottomSheet>(null);
 
+  // Use effect adalah lifecycle dari react dipanggil ketika halaman ini muncul di layar
+  // Code dibawah ngambil weather pertama kali.
   useEffect(() => {
+    // Ambil dari storage employee info
     AsyncStorage.getItem(STORAGE_KEY.EMPLOYEE_INFO, async (err, result) => {
       if (result) {
         setEmployeeInfo(JSON.parse(result));
-
         const URL = `${BMKG_API_URL}${LOKASI_PERAIRAN[0].endpoint}`;
         let response = await fetch(URL, {
           method: 'GET',
@@ -68,6 +80,7 @@ export default function MainScene(props: Props) {
     });
   }, []);
 
+  // Lifecycle ini dijalankan ketika code (lihat dipaling atas) berubah
   useEffect(() => {
     async function fetchPerairan() {
       const URL = `${BMKG_API_URL}${findPerairanFromCode(code)?.endpoint}`;
@@ -83,6 +96,7 @@ export default function MainScene(props: Props) {
     fetchPerairan();
   }, [code]);
 
+  // Render tampilan
   return (
     <FrameView style={styles.container}>
       <View
@@ -119,6 +133,7 @@ export default function MainScene(props: Props) {
               <TouchableOpacity
                 style={styles.menuItemContainer}
                 onPress={() => {
+                  // Proses log out. Clear storage, balik ke AuthScene
                   AsyncStorage.clear(() => {
                     props.navigation.reset({
                       index: 0,
@@ -281,7 +296,7 @@ const styles = StyleSheet.create({
   },
   menuContainer: {
     position: 'absolute',
-    zIndex: 2,
+    zIndex: 3,
     top: 30,
     right: 0,
     width: 180,
@@ -296,5 +311,14 @@ const styles = StyleSheet.create({
   menuItemContainer: {
     paddingLeft: 12,
     paddingVertical: 12,
+  },
+  menuBackdrop: {
+    position: 'absolute',
+    zIndex: 3,
+    backgroundColor: 'red',
+    top: 0,
+    right: 0,
+    width: 300,
+    height: 300,
   },
 });

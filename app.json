@@ -21,7 +21,8 @@
     },
     "android": {
       "package": "com.pertamini.pecat",
-      "versionCode": 100
+      "versionCode": 100,
+      "useNextNotificationsApi": true
     },
     "web": {
       "favicon": "./assets/favicon.png"

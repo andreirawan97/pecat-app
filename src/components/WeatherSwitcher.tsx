@@ -58,6 +58,10 @@ export default function WeatherSwitcher(props: Props) {
       <View style={{ flex: 1, marginTop: 12 }}>
         <ScrollView>
           <Text style={styles.paragraphText}>
+            <Text style={{ fontWeight: 'bold' }}>Cuaca: </Text>
+            {weatherInfo[selectedIndex].weather}
+          </Text>
+          <Text style={styles.paragraphText}>
             <Text style={{ fontWeight: 'bold' }}>Kategori Ombak: </Text>
             {weatherInfo[selectedIndex].wave_cat}
           </Text>

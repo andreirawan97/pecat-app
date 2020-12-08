@@ -19,10 +19,13 @@ export default function AuthScene(props: Props) {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Function yang dijalankan ketika login dipencet
   const onLoginPressed = async () => {
     setErrorMessage('');
     setFetching(true);
+    // Kalo email dan passwordnya ada teksnya
     if (email && password) {
+      // Kirim response
       const URL = `${API_URL}${ENDPOINTS.LOGIN}`;
 
       let response = await fetch(URL, {
@@ -37,6 +40,7 @@ export default function AuthScene(props: Props) {
       });
       let data = await response.json();
       if (data.success) {
+        // Kalau berhasil, simpen employee info di storage, kemudian navigate ke MainScene
         AsyncStorage.setItem(
           STORAGE_KEY.EMPLOYEE_INFO,
           JSON.stringify(data.employee),
