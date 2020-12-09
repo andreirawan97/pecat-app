@@ -26,8 +26,7 @@ export default function NotificationProvider(props: Props) {
   async function schedulePushNotification() {
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: 'Hello!',
-        body: 'Cuaca lagi buruk, mohon tidak bekerja.',
+        body: 'Cuaca sedang buruk, mohon tidak bekerja.',
       },
       trigger: { seconds: 5 },
     });
