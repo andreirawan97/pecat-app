@@ -4,6 +4,7 @@ import JadwalList from './JadwalList';
 import Loading from './Loading';
 import WeatherSwitcher from './WeatherSwitcher';
 import PerairanSelection from './PerairanSelection';
+import NotificationProvider from './NotificationProvider';
 
 export {
   TextInput,
@@ -12,4 +13,5 @@ export {
   Loading,
   WeatherSwitcher,
   PerairanSelection,
+  NotificationProvider,
 };
